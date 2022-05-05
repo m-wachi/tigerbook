@@ -1,0 +1,61 @@
+(*
+You must follow instructions one through six in Section 5 to create the parser and lexer functors and load them. After you have done this, you must then apply the functors to produce the CalcParser structure. The code for doing this is shown below.
+*)
+
+structure CalcLrVals =
+    CalcLrValsFun(structure Token = LrParser.Token)
+structure CalcLex =
+    CalcLexFun(structure Tokens = CalcLrVals.Tokens);
+structure CalcParser =
+     Join(structure LrParser = LrParser
+          structure ParserData = CalcLrVals.ParserData
+          structure Lex = CalcLex)
+
+(*
+Now we need a function which given a lexer invokes the parser. The function invoke does this.
+*)
+
+val invoke = fn lexstream =>
+  let val print_error = fn (s,i:int,_) =>
+       output(std_out,"Error, line " ^
+                      (makestring i) ^ ", " ^ s ^ "\n")
+  in CalcParser.parse(0,lexstream,print_error,())
+  end
+
+(*
+We also need a function which reads a line of input from the terminal
+*)
+
+  val input_line = fn f =>
+    let fun loop result =
+          let val c = input (f,1)
+              val result = c :: result
+          in if String.size c = 0 orelse c = "\n" then
+                String.implode (rev result)
+             else loop result
+          end
+    in loop nil
+    end
+
+(*
+Standard ML of New Jersey has a function input_line in its built-in environment that does this more efficiently.
+Finally, we need a function which can read one or more expressions from the standard input. The function parse, shown below, does this. It runs the calculator on the standard input and terminates when an end-of-file is encountered.
+*)
+
+val parse = fn () => 
+    let val lexer = CalcParser.makeLexer (fn _ => input_line std_in)
+        val dummyEOF = CalcLrVals.Tokens.EOF(0,0)
+        val dummySEMI = CalcLrVals.Tokens.SEMI(0,0)
+        fun loop lexer =
+           let val (result,lexer) = invoke lexer
+               val (nextToken,lexer) = CalcParser.Stream.get lexer
+               val _ = case result
+                  of SOME r =>
+                      output(std_out,
+                         "result = " ^ (makestring r) ^ "\n")
+                   | NONE => ()
+           in if CalcParser.sameToken(nextToken,dummyEOF) then ()
+              else loop lexer
+           end
+     in loop lexer
+     end

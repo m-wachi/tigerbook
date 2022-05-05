@@ -3,6 +3,9 @@
 fun lookup "bogus" = 10000
   | lookup s = 0
 
+val flush_out = TextIO.flushOut
+val std_out = TextIO.stdOut
+
 %%
 
 %eop EOF SEMI
@@ -34,7 +37,7 @@ fun lookup "bogus" = 10000
 
 (* the parser returns the value associated with the expression *)
 
-  START : PRINT EXP (print EXP;
+  START : PRINT EXP (print (Int.toString EXP);
                      print "\n";
                      flush_out std_out; SOME EXP)
         | EXP (SOME EXP)

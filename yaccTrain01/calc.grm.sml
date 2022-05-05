@@ -13,6 +13,9 @@ struct
 fun lookup "bogus" = 10000
   | lookup s = 0
 
+val flush_out = TextIO.flushOut
+val std_out = TextIO.stdOut
+
 
 end
 structure LrTable = Token.LrTable
@@ -197,7 +200,7 @@ of  ( 0, ( ( _, ( MlyValue.EXP EXP1, _, EXP1right)) :: ( _, ( _,
 PRINT1left, _)) :: rest671)) => let val  result = MlyValue.START (fn _
  => let val  (EXP as EXP1) = EXP1 ()
  in (
-print EXP;
+print (Int.toString EXP);
                      print "\n";
                      flush_out std_out; SOME EXP
 )

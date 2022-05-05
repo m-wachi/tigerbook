@@ -8,8 +8,12 @@ type lexresult= (svalue,pos) token
 val pos = ref 0
 val eof = fn () => Tokens.EOF(!pos,!pos)
 val error = fn (e,l : int,_) =>
-              output(std_out,"line " ^ (makestring l) ^
+              TextIO.output(TextIO.stdOut,"line " ^ (Int.toString l) ^
                                ": " ^ e ^ "\n")
+
+val f1 = fn (x, acc) => ord(x) - ord(#"0") + 10 * acc
+val strToInt = fn (s : string) => foldl f1 0 (explode s)
+
 %%
 %header (functor CalcLexFun(structure Tokens: Calc_TOKENS));
 alpha=[A-Za-z];
@@ -18,10 +22,7 @@ ws = [\ \t];
 %%
 \n       => (pos := (!pos) + 1; lex());
 {ws}+    => (lex());
-{digit}+ => (Tokens.NUM
-                (revfold (fn (a,r) => ord(a)-ord("0")+10*r)
-                         (explode yytext) 0,
-                  !pos,!pos));
+{digit}+ => (Tokens.NUM ((strToInt yytext),!pos,!pos));
 "+"      => (Tokens.PLUS(!pos,!pos));
 "*"      => (Tokens.TIMES(!pos,!pos));
 ";"      => (Tokens.SEMI(!pos,!pos));

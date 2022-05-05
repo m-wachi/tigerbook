@@ -112,8 +112,12 @@ type lexresult= (svalue,pos) token
 val pos = ref 0
 val eof = fn () => Tokens.EOF(!pos,!pos)
 val error = fn (e,l : int,_) =>
-              output(std_out,"line " ^ (makestring l) ^
+              TextIO.output(TextIO.stdOut,"line " ^ (Int.toString l) ^
                                ": " ^ e ^ "\n")
+
+val f1 = fn (x, acc) => ord(x) - ord(#"0") + 10 * acc
+val strToInt = fn (s : string) => foldl f1 0 (explode s)
+
 
 
       end
@@ -179,11 +183,7 @@ fun yyAction1 (strm, lastMatch : yymatch) = (yystrm := strm; (lex()))
 fun yyAction2 (strm, lastMatch : yymatch) = let
       val yytext = yymktext(strm)
       in
-        yystrm := strm;
-        (Tokens.NUM
-                (revfold (fn (a,r) => ord(a)-ord("0")+10*r)
-                         (explode yytext) 0,
-                  !pos,!pos))
+        yystrm := strm; (Tokens.NUM ((strToInt yytext),!pos,!pos))
       end
 fun yyAction3 (strm, lastMatch : yymatch) = (yystrm := strm;
       (Tokens.PLUS(!pos,!pos)))

@@ -1,0 +1,37 @@
+(* Sample interactive calculator for ML-Yacc *)
+
+val flush_out = TextIO.flushOut
+val std_out = TextIO.stdOut
+
+%%
+
+%eop EOF
+
+(* %pos declares the type of positions for terminals.
+   Each symbol has an associated left and right position. *)
+
+%pos int
+
+%left PLUS
+
+%term ID | NUM | PLUS | EOF | PRINT
+%nonterm EXP | START
+
+%name myLang
+
+%subst PRINT for ID
+%prefer PLUS
+%keyword PRINT
+
+%noshift EOF
+%value ID ("bogus")
+%nodefault
+%verbose
+%%
+
+(* the parser returns the value associated with the expression *)
+
+  START : EXP (SOME EXP)
+        | (NONE)
+  EXP : NUM             (NUM)
+      | EXP PLUS EXP    (Tokens.PLUS(pos, pos+1))

@@ -1,0 +1,71 @@
+
+state 0:
+
+	START : . EXP 
+	START : .  (reduce by rule 1)
+
+	NUM	shift 2
+	EOF	reduce by rule 1
+
+	EXP	goto 1
+	START	goto 5
+
+	.	error
+
+
+state 1:
+
+	EXP : EXP . PLUS EXP 
+	START : EXP .  (reduce by rule 0)
+
+	PLUS	shift 3
+	EOF	reduce by rule 0
+
+
+	.	error
+
+
+state 2:
+
+	EXP : NUM .  (reduce by rule 2)
+
+	PLUS	reduce by rule 2
+	EOF	reduce by rule 2
+
+
+	.	error
+
+
+state 3:
+
+	EXP : EXP PLUS . EXP 
+
+	NUM	shift 2
+
+	EXP	goto 4
+
+	.	error
+
+
+state 4:
+
+	EXP : EXP . PLUS EXP 
+	EXP : EXP PLUS EXP .  (reduce by rule 3)
+
+	PLUS	reduce by rule 3
+	EOF	reduce by rule 3
+
+
+	.	error
+
+
+state 5:
+
+
+	EOF	accept
+
+
+	.	error
+
+10 of 16 action table entries left after compaction
+3 goto table entries

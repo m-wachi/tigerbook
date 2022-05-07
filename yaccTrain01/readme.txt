@@ -13,6 +13,7 @@
   use "calc.grm.sig";
   use "calc.lex.sml";
   use "calc.grm.sml";
+  use "calc.sml";
   Calc.parse ();
 
  then Calc run. type "12 + 3;", result will be printed.

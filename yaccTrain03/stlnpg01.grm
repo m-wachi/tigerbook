@@ -1,0 +1,23 @@
+(* val table = ref (nil: (string * int) list) *)
+type table = string -> int
+val emptytable = fn j => raise Fail("uninitialized var: " ^ j)
+fun printInt i = print (Int.toString i)
+%%
+%term INT of int | PRINT | SEMICOLON | EOF
+
+%nonterm stm of table->table
+       | prog of table
+
+%name Stlnpg01
+
+%right SEMICOLON
+
+%start prog
+%eop EOF
+%pos int
+
+%%
+prog: stm                    (stm(emptytable))
+
+stm: stm SEMICOLON stm       (fn t => stm2(stm1(t)))
+stm: PRINT INT               (fn t => (print (Int.toString INT); t))

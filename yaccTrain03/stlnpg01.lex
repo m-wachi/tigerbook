@@ -24,6 +24,6 @@ ws = [\ \t];
 {ws}+    => (lex());
 ";"      => (Tokens.SEMICOLON (!pos, !pos));
 {digit}+ => (Tokens.INT ((strToInt yytext),!pos,!pos));
-"print"  => (Tokens.PRINT (!pos, !pos));
+"print"  => (Tokens.PRINT ("print", !pos, !pos));
 "."      => (error ("ignoring bad character "^yytext,!pos,!pos);
              lex());

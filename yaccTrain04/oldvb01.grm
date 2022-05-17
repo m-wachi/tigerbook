@@ -1,0 +1,32 @@
+(* val table = ref (nil: (string * int) list) *)
+type table = string -> int
+val emptytable = fn j => raise Fail("uninitialized var: " ^ j)
+fun printInt i = print (Int.toString i)
+%%
+
+%term INT of int | PRINT of string | NEWLINE of string | EOF
+
+(*
+%nonterm stm of table->table
+       | prog of table
+*)
+
+%nonterm stm of string
+       | stms of string
+       | prog of string
+
+
+%name Oldvb01
+
+%right NEWLINE
+
+%start prog
+%eop EOF
+%pos int
+
+%%
+prog: stms                   (stms)
+
+stms: stm stm                (stm; stm)
+
+stm: PRINT INT NEWLINE       (print ("print " ^ (Int.toString INT) ^ "\n"); "print INT")

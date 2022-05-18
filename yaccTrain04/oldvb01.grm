@@ -27,6 +27,6 @@ fun printInt i = print (Int.toString i)
 %%
 prog: stms                   (stms)
 
-stms: stm stm                (stm; stm)
+stms: stms stm               (stms; stm)
 
 stm: PRINT INT NEWLINE       (print ("print " ^ (Int.toString INT) ^ "\n"); "print INT")

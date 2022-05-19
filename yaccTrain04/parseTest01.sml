@@ -19,21 +19,21 @@ struct
             fun get _ = TextIO.input file
 	     fun parseerror(s,p1,p2) = ErrorMsg.error p1 s
 	     val lexer = LrParser.Stream.streamify (Oldvb01Lex.makeLexer get)
-             val dummyEOF = Oldvb01LrVals.Tokens.EOF(0,0)
+            val dummyEOF = Oldvb01LrVals.Tokens.EOF(0,0)
 	     fun loop lexer tokens =
 	         let val (result, lexer) = Oldvb01Parser.Stream.get lexer
-		 in
-                     print "get token.\n";
+		  in
+                    print "get token.\n";
      	             if Oldvb01Parser.sameToken(result, dummyEOF)
-                     then tokens
-		     else loop lexer (result :: tokens)
+                    then tokens
+		      else loop lexer (result :: tokens)
 		 end
         in
             let
                 val a = loop lexer nil
             in
                 TextIO.closeIn file;
-		a
+		  rev a
             end
         end handle LrParser.ParseError => raise ErrorMsg.Error
 

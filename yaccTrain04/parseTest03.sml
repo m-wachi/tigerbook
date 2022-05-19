@@ -26,9 +26,11 @@ struct
                 val (t1, s1) = Oldvb01Parser.Stream.get lexer
                 val (t2, s2) = Oldvb01Parser.Stream.get s1
                   *)
-                val ret = Oldvb01Parser.parse(30,lexer,parseerror,())
+                val ret = Oldvb01Parser.parse(0,lexer,parseerror,())
+                val (ret1, ret2) = ret
             in
                 TextIO.closeIn file;
+                print ret1; print "\n";
                 ret
             end
         end handle LrParser.ParseError => raise ErrorMsg.Error

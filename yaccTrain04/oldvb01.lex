@@ -20,7 +20,7 @@ alpha=[A-Za-z];
 digit=[0-9];
 ws = [\ \t];
 %%
-\n       => (pos := (!pos) + 1; Tokens.NEWLINE("newline", (!pos)-1, (!pos)-1));
+\n       => (pos := (!pos) + 1; Tokens.LINE_TERM("line_term", (!pos)-1, (!pos)-1));
 {ws}+    => (lex());
 {digit}+ => (Tokens.INT ((strToInt yytext),!pos,!pos));
 "print"  => (Tokens.PRINT ("print", !pos, !pos));

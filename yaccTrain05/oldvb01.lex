@@ -19,11 +19,17 @@ val strToInt = fn (s : string) => foldl f1 0 (explode s)
 alpha=[A-Za-z];
 digit=[0-9];
 ws = [\ \t];
+%s STR,COMMENT;
 %%
-\n       => (pos := (!pos) + 1; Tokens.LINE_TERM("line_term", (!pos)-1, (!pos)-1));
-{ws}+    => (lex());
-{digit}+ => (Tokens.INT ((strToInt yytext),!pos,!pos));
-"print"  => (Tokens.PRINT ("print", !pos, !pos));
-{alpha}+ => (Tokens.ID(yytext, yypos, yypos));
-"."      => (error ("ignoring bad character "^yytext,!pos,!pos);
-             lex());
+<INITIAL>\n       => (pos := (!pos) + 1; Tokens.LINE_TERM("line_term", (!pos)-1, (!pos)-1));
+<INITIAL>{ws}+    => (lex());
+<INITIAL>{digit}+ => (Tokens.INT ((strToInt yytext),!pos,!pos));
+<INITIAL>"print"  => (Tokens.PRINT ("print", !pos, !pos));
+<INITIAL>{alpha}+ => (Tokens.ID(yytext, yypos, yypos));
+<INITIAL>"'"      => (YYBEGIN COMMENT; continue());
+<INITIAL>"\""     => (YYBEGIN STR; continue());
+<INITIAL>.        => (error ("ignoring bad character "^yytext,!pos,!pos); lex());
+<COMMENT>\n       => (YYBEGIN INITIAL; Tokens.LINE_TERM("line_term", yypos, yypos));
+<COMMENT>.        => (continue());
+<STR>"\""      => (YYBEGIN INITIAL; continue());
+<STR>{alpha}+  => (Tokens.STRING (yytext, yypos, yypos));

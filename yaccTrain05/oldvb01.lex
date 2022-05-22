@@ -19,7 +19,8 @@ val strToInt = fn (s : string) => foldl f1 0 (explode s)
 alpha=[A-Za-z];
 digit=[0-9];
 ws = [\ \t];
-%s STR,COMMENT;
+%s STR COMMENT;
+%full
 %%
 <INITIAL>\n       => (pos := (!pos) + 1; Tokens.LINE_TERM("line_term", (!pos)-1, (!pos)-1));
 <INITIAL>{ws}+    => (lex());
@@ -28,6 +29,7 @@ ws = [\ \t];
 <INITIAL>{alpha}+ => (Tokens.ID(yytext, yypos, yypos));
 <INITIAL>"'"      => (YYBEGIN COMMENT; continue());
 <INITIAL>"\""     => (YYBEGIN STR; continue());
+<INITIAL>[^\ ]+   => (Tokens.ID(yytext, yypos, yypos));
 <INITIAL>.        => (error ("ignoring bad character "^yytext,!pos,!pos); lex());
 <COMMENT>\n       => (YYBEGIN INITIAL; Tokens.LINE_TERM("line_term", yypos, yypos));
 <COMMENT>.        => (continue());

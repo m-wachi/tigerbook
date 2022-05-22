@@ -34,4 +34,5 @@ ws = [\ \t];
 <COMMENT>\n       => (YYBEGIN INITIAL; Tokens.LINE_TERM("line_term", yypos, yypos));
 <COMMENT>.        => (continue());
 <STR>"\""      => (YYBEGIN INITIAL; continue());
-<STR>{alpha}+  => (Tokens.STRING (yytext, yypos, yypos));
+<STR>\n        => (error ("error newline in string",yypos,yypos); lex());
+<STR>.+  => (Tokens.STRING (yytext, yypos, yypos));

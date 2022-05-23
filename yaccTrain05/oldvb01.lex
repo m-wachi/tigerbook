@@ -22,16 +22,17 @@ ws = [\ \t];
 %s STR COMMENT;
 %full
 %%
-<INITIAL>\n       => (pos := (!pos) + 1; Tokens.LINE_TERM("line_term", (!pos)-1, (!pos)-1));
+<INITIAL>\n       => (pos := (!pos) + 1; Tokens.LINE_TERM("line_term", yypos, yypos));
 <INITIAL>"'"      => (YYBEGIN COMMENT; continue());
+<INITIAL>"\"\""   => (Tokens.STRING ("", yypos, yypos));
 <INITIAL>"\""     => (YYBEGIN STR; continue());
 <INITIAL>{ws}+    => (lex());
-<INITIAL>{digit}+ => (Tokens.INT ((strToInt yytext),!pos,!pos));
-<INITIAL>"print"  => (Tokens.PRINT ("print", !pos, !pos));
+<INITIAL>{digit}+ => (Tokens.INT ((strToInt yytext),yypos,yypos));
+<INITIAL>"print"  => (Tokens.PRINT ("print", yypos, yypos));
 <INITIAL>{alpha}+ => (Tokens.ID(yytext, yypos, yypos));
-<INITIAL>.        => (error ("ignoring bad character "^yytext,!pos,!pos); lex());
+<INITIAL>.        => (error ("ignoring bad character "^yytext,yypos,yypos); lex());
 <COMMENT>\n       => (YYBEGIN INITIAL; Tokens.LINE_TERM("line_term", yypos, yypos));
 <COMMENT>.        => (continue());
+<STR>([^\n\"]|"\"\"")+  => (Tokens.STRING (yytext, yypos, yypos));
 <STR>"\""      => (YYBEGIN INITIAL; continue());
 <STR>\n        => (error ("error newline in string",yypos,yypos); lex());
-<STR>[^\n\"]+  => (Tokens.STRING (yytext, yypos, yypos));

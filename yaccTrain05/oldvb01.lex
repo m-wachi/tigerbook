@@ -23,16 +23,15 @@ ws = [\ \t];
 %full
 %%
 <INITIAL>\n       => (pos := (!pos) + 1; Tokens.LINE_TERM("line_term", (!pos)-1, (!pos)-1));
+<INITIAL>"'"      => (YYBEGIN COMMENT; continue());
+<INITIAL>"\""     => (YYBEGIN STR; continue());
 <INITIAL>{ws}+    => (lex());
 <INITIAL>{digit}+ => (Tokens.INT ((strToInt yytext),!pos,!pos));
 <INITIAL>"print"  => (Tokens.PRINT ("print", !pos, !pos));
 <INITIAL>{alpha}+ => (Tokens.ID(yytext, yypos, yypos));
-<INITIAL>"'"      => (YYBEGIN COMMENT; continue());
-<INITIAL>"\""     => (YYBEGIN STR; continue());
-<INITIAL>[^\ ]+   => (Tokens.ID(yytext, yypos, yypos));
 <INITIAL>.        => (error ("ignoring bad character "^yytext,!pos,!pos); lex());
 <COMMENT>\n       => (YYBEGIN INITIAL; Tokens.LINE_TERM("line_term", yypos, yypos));
 <COMMENT>.        => (continue());
 <STR>"\""      => (YYBEGIN INITIAL; continue());
 <STR>\n        => (error ("error newline in string",yypos,yypos); lex());
-<STR>.+  => (Tokens.STRING (yytext, yypos, yypos));
+<STR>[^\n\"]+  => (Tokens.STRING (yytext, yypos, yypos));

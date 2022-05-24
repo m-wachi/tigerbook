@@ -1,0 +1,5 @@
+abcde "fgh "  def
+"かきくけこ"
+ijk  'opqさしす
+lmn "opq""rst" 12
+ac "" df " "

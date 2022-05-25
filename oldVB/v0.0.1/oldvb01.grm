@@ -4,7 +4,11 @@ val emptytable = fn j => raise Fail("uninitialized var: " ^ j)
 fun printInt i = print (Int.toString i)
 %%
 
-%term ID of string | INT of int | PRINT of string | LINE_TERM of string | STRING of string | EOF
+%term ID of string | INT of int | STRING of string 
+    | PRINT of string 
+    | LINE_TERM of string
+    | COMMENT of string
+    | EOF
 
 (*
 %nonterm stm of table->table
@@ -35,7 +39,8 @@ logical_lines:
     | logical_lines logical_line       (logical_lines ^ "\n" ^ logical_line)
 
 logical_line: 
-    syms LINE_TERM                   (syms)
+    syms COMMENT LINE_TERM           (syms ^ "," ^ COMMENT)
+    | syms LINE_TERM                 (syms)
     | syms                           (syms)
     | LINE_TERM                      ("")
 

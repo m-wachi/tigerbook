@@ -6,6 +6,7 @@ $/ml-yacc-lib.cm
 table.sig
 table.sml
 symbol.sml
+absyn.sml
 oldvb01.grm
 oldvb01.lex
 errormsg.sml

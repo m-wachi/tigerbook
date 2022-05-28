@@ -1,5 +1,3 @@
-dim a as string
+Dim a As String
 
 a = 10
-
-print a

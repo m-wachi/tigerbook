@@ -1,0 +1,48 @@
+(* val table = ref (nil: (string * int) list) *)
+type table = string -> int
+val emptytable = fn j => raise Fail("uninitialized var: " ^ j)
+fun printInt i = print (Int.toString i)
+%%
+
+%term ID of string | INT of int | STRING of string
+    | PRINT of string 
+    | LINE_TERM
+    | COMMENT of string
+    | EOF
+
+%nonterm logical_lines of Absyn.exp list
+       | logical_line of Absyn.exp list
+       | syms of Absyn.exp list
+       | sym of Absyn.exp
+       | prog of Absyn.exp list
+
+
+%name Oldvb01
+
+%verbose
+
+%start prog
+%eop EOF
+%noshift EOF
+%pos int
+
+%%
+prog: logical_lines                   (logical_lines)
+
+logical_lines: 
+    logical_line                       (logical_line)
+    | logical_lines logical_line       (logical_lines @ logical_line)
+
+logical_line: 
+    syms COMMENT LINE_TERM           (syms @ [Absyn.CommentExp COMMENT, Absyn.LinetermExp])
+    | syms LINE_TERM                 (syms @ [Absyn.LinetermExp])
+    | syms                           (syms)
+    | LINE_TERM                      ([Absyn.LinetermExp])
+
+syms: sym                  ([sym])
+    | syms sym             (syms @ [sym])
+
+sym: INT                   (Absyn.IntExp INT)
+    | ID                   (Absyn.VarExp (Absyn.SimpleVar(Symbol.symbol ID, 0)))
+    | STRING               (Absyn.StringExp(STRING, 0))
+

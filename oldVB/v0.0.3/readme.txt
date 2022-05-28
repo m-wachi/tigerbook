@@ -2,8 +2,8 @@ command line:
   $ sml sources.cm
 
 then smlnj interpriter
-  - Oldvb01.parse "testdata06.txt";
+  - Oldvb01.parse "test01.vb";
   or
-  - Oldvb01.doLex "testdata06.txt";
+  - Oldvb01.doLex "test01.vb";
   
 

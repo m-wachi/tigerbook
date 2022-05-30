@@ -14,11 +14,11 @@ fun printInt i = print (Int.toString i)
     | COMMENT of string
     | EOF
 
-%nonterm  prog of Absyn.lgclline list
-       | logical_lines of Absyn.lgclline list
-       | logical_line of Absyn.lgclline
-       | local_var_decl of Absyn.lgclline
-       | statement of Absyn.lgclline
+%nonterm  prog of Absyn.lgline list
+       | logical_lines of Absyn.lgline list
+       | logical_line of Absyn.lgline
+       | local_var_decl of Absyn.statement
+       | statement of Absyn.statement
        | exp of Absyn.exp
 
 
@@ -39,17 +39,23 @@ logical_lines:
     | logical_lines logical_line       (logical_lines @ [logical_line])
 
 logical_line: 
-    local_var_decl                   (local_var_decl)
+    statement COMMENT LINE_TERM      ((statement), COMMENT)
+    | statement LINE_TERM      ((statement), "")
     (* syms COMMENT LINE_TERM           (syms @ [Absyn.CommentExp COMMENT, Absyn.LinetermExp]) *)
     (* | syms LINE_TERM                 (syms @ [Absyn.LinetermExp]) *)
     (* | syms                           (syms) *)
+    | COMMENT LINE_TERM              (Absyn.BlankLine, COMMENT)
+    | LINE_TERM                      (Absyn.BlankLine, "")
+
+
+statement:
+    local_var_decl                   (local_var_decl)
     | ID EQUAL exp                   (Absyn.AssignStmt (Absyn.SimpleVar(Symbol.symbol ID, 0), exp))
-    | COMMENT LINE_TERM              (Absyn.CommentExp COMMENT)
-    | LINE_TERM                      (Absyn.LinetermExp)
 
 
-local_var_decl: DIM ID AS TY_STRING LINE_TERM (Absyn.LclVarDecl ((Absyn.SimpleVar(Symbol.symbol ID, 0)), Absyn.VbTyString))
-   
+local_var_decl: DIM ID AS TY_STRING (Absyn.LclVarDecl ((Absyn.SimpleVar(Symbol.symbol ID, 0)), Absyn.VbTyString))
+
+  
 exp: INT                         (Absyn.IntExp INT)
     | STRING                     (Absyn.StringExp (STRING, 0))
 

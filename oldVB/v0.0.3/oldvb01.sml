@@ -61,6 +61,20 @@ struct
             end
         end handle LrParser.ParseError => raise ErrorMsg.Error
 
+    fun symToStr (sym: Symbol.symbol) =
+        Symbol.name sym
+
+    fun varToStr (v: Absyn.var) =
+        case v of
+	    Absyn.SimpleVar (sym, _) => symToStr sym
+
+    fun stmtToStr (stmt: Absyn.statement) =
+        case stmt of
+	    Absyn.LclVarDecl (v, t) =>
+                "LclVarDecl var=" ^ (varToStr v)
+            | _ => "unexpected stmt. stmtToStr."
+
+
     fun test01 p1 =
         let
 	    val (b, _) = p1
@@ -68,5 +82,9 @@ struct
 	in
 	    c
 	end
-	
+
+
+    fun test02 (p1, p2) =
+        stmtToStr p1
+
 end (* structure Oldvb01 *)

@@ -61,4 +61,12 @@ struct
             end
         end handle LrParser.ParseError => raise ErrorMsg.Error
 
+    fun test01 p1 =
+        let
+	    val (b, _) = p1
+	    val c = hd b
+	in
+	    c
+	end
+	
 end (* structure Oldvb01 *)

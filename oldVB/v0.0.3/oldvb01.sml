@@ -61,18 +61,6 @@ struct
             end
         end handle LrParser.ParseError => raise ErrorMsg.Error
 
-    fun symToStr (sym: Symbol.symbol) =
-        Symbol.name sym
-
-    fun varToStr (v: Absyn.var) =
-        case v of
-	    Absyn.SimpleVar (sym, _) => symToStr sym
-
-    fun stmtToStr (stmt: Absyn.statement) =
-        case stmt of
-	    Absyn.LclVarDecl (v, t) =>
-                "LclVarDecl var=" ^ (varToStr v)
-            | _ => "unexpected stmt. stmtToStr."
 
 
     fun test01 p1 =
@@ -84,7 +72,21 @@ struct
 	end
 
 
-    fun test02 (p1, p2) =
-        stmtToStr p1
+    fun test02 p1 =
+        Absyn.lglineToStr p1
+
+    fun test03 (x, _) = x
+
+    fun print01 lglines =
+        if null lglines then ()
+        else 
+            let 
+                val lgl1::lgls = lglines
+            in
+                print (Absyn.lglineToStr lgl1);
+                print01 lgls
+            end
+
+    fun printAll (x, _) = print01 x
 
 end (* structure Oldvb01 *)

@@ -29,5 +29,23 @@ datatype lgclline = LclVarDecl of var * vbtype
 *)
 
 
+
+fun symToStr (sym: Symbol.symbol) =
+    Symbol.name sym
+
+fun varToStr (v: var) =
+    case v of
+        SimpleVar (sym, _) => symToStr sym
+
+fun stmtToStr (stmt: statement) =
+    case stmt of
+        LclVarDecl (v, t) =>
+            "LclVarDecl var=" ^ (varToStr v)
+            | _ => "unexpected stmt. stmtToStr."
+
+fun lglineToStr (stmt: statement, cmnt: comment) =
+    "statement: " ^ (stmtToStr stmt) 
+        ^ "\ncomment: " ^ cmnt ^ "\n"
+
 end
         

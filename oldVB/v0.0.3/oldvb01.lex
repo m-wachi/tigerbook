@@ -27,6 +27,7 @@ ws = [\ \t];
 <INITIAL>"\"\""   => (Tokens.STRING ("", yypos, yypos));
 <INITIAL>"\""     => (YYBEGIN STR; continue());
 <INITIAL>"="      => (Tokens.EQUAL(yypos, yypos));
+<INITIAL>Integer  => (Tokens.TY_INT(yypos, yypos));
 <INITIAL>String   => (Tokens.TY_STRING(yypos, yypos));
 <INITIAL>Dim      => (Tokens.DIM(yypos, yypos));
 <INITIAL>As       => (Tokens.AS(yypos, yypos));

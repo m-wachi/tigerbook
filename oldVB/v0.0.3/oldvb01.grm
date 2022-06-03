@@ -10,6 +10,7 @@ fun printInt i = print (Int.toString i)
     | DIM
     | AS
     | TY_STRING
+    | TY_INT
     | LINE_TERM
     | COMMENT of string
     | EOF
@@ -20,7 +21,7 @@ fun printInt i = print (Int.toString i)
        | local_var_decl of Absyn.statement
        | statement of Absyn.statement
        | exp of Absyn.exp
-
+       | vbtype of Absyn.vbtype
 
 %name Oldvb01
 
@@ -53,8 +54,12 @@ statement:
     | ID EQUAL exp                   (Absyn.AssignStmt (Absyn.SimpleVar(Symbol.symbol ID, 0), exp))
 
 
-local_var_decl: DIM ID AS TY_STRING (Absyn.LclVarDecl ((Absyn.SimpleVar(Symbol.symbol ID, 0)), Absyn.VbTyString))
+local_var_decl: 
+    DIM ID AS vbtype (Absyn.LclVarDecl ((Absyn.SimpleVar(Symbol.symbol ID, 0)), (vbtype)))
 
+vbtype:
+    TY_STRING (Absyn.VbTyString)
+    | TY_INT (Absyn.VbTyInt)
   
 exp: INT                         (Absyn.IntExp INT)
     | STRING                     (Absyn.StringExp (STRING, 0))

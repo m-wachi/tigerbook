@@ -1,5 +1,6 @@
 Dim a As String ' a is something.
-
+Dim b As Integer
 'this is comment
 
-a = 10  ' assign 10
+a = "abc"
+b = 10  ' assign 10

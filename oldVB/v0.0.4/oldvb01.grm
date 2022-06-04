@@ -1,0 +1,66 @@
+(* val table = ref (nil: (string * int) list) *)
+type table = string -> int
+val emptytable = fn j => raise Fail("uninitialized var: " ^ j)
+fun printInt i = print (Int.toString i)
+%%
+
+%term ID of string | INT of int | STRING of string
+    | PRINT of string 
+    | EQUAL
+    | DIM
+    | AS
+    | TY_STRING
+    | TY_INT
+    | LINE_TERM
+    | COMMENT of string
+    | EOF
+
+%nonterm  prog of Absyn.lgline list
+       | logical_lines of Absyn.lgline list
+       | logical_line of Absyn.lgline
+       | local_var_decl of Absyn.statement
+       | statement of Absyn.statement
+       | exp of Absyn.exp
+       | vbtype of Absyn.vbtype
+
+%name Oldvb01
+
+%verbose
+
+%start prog
+%eop EOF
+%noshift EOF
+%pos int
+
+%%
+prog: logical_lines                   (logical_lines)
+
+logical_lines: 
+    logical_line                       ([logical_line])
+    | logical_lines logical_line       (logical_lines @ [logical_line])
+
+logical_line: 
+    statement COMMENT LINE_TERM      ((statement), COMMENT)
+    | statement LINE_TERM      ((statement), "")
+    (* syms COMMENT LINE_TERM           (syms @ [Absyn.CommentExp COMMENT, Absyn.LinetermExp]) *)
+    (* | syms LINE_TERM                 (syms @ [Absyn.LinetermExp]) *)
+    (* | syms                           (syms) *)
+    | COMMENT LINE_TERM              (Absyn.BlankLine, COMMENT)
+    | LINE_TERM                      (Absyn.BlankLine, "")
+
+
+statement:
+    local_var_decl                   (local_var_decl)
+    | ID EQUAL exp                   (Absyn.AssignStmt (Absyn.SimpleVar(Symbol.symbol ID, 0), exp))
+
+
+local_var_decl: 
+    DIM ID AS vbtype (Absyn.LclVarDecl ((Absyn.SimpleVar(Symbol.symbol ID, 0)), (vbtype)))
+
+vbtype:
+    TY_STRING (Absyn.VbTyString)
+    | TY_INT (Absyn.VbTyInt)
+  
+exp: INT                         (Absyn.IntExp INT)
+    | STRING                     (Absyn.StringExp (STRING, 0))
+

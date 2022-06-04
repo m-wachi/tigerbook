@@ -1,5 +1,6 @@
-'Dim a As String
+Dim a As String
 
-'a = 10
+a = "Hello world."
 
-'Print a
+Debug.Print = 10
+

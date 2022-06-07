@@ -1,6 +1,11 @@
-Dim a As String
+Sub Proc
 
-a = "Hello world."
+    Dim a As String
 
-Debug.Print = 10
+    a = "Hello world."
+    
+   Debug.Print = 10
+
+End Sub
+
 

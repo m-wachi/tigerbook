@@ -9,6 +9,8 @@ fun printInt i = print (Int.toString i)
     | EQUAL
     | DIM
     | AS
+    | SUB
+    | END
     | TY_STRING
     | TY_INT
     | LINE_TERM
@@ -52,6 +54,8 @@ logical_line:
 statement:
     local_var_decl                   (local_var_decl)
     | ID EQUAL exp                   (Absyn.AssignStmt (Absyn.SimpleVar(Symbol.symbol ID, 0), exp))
+    | SUB ID LINE_TERM                 (Absyn.ProcStart (Symbol.symbol ID))
+    | END SUB LINE_TERM                (Absyn.EndProc)
 
 
 local_var_decl: 

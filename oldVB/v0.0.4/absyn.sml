@@ -17,11 +17,9 @@ datatype exp = VarExp of var
 
 datatype statement = LclVarDecl of var * vbtype
         | AssignStmt of var * exp
-        | ProcStart of symbol
-        | EndProc
+        | ProcStart of symbol * (lgline list)
         | BlankLine
-
-type lgline = (statement * comment)
+withtype lgline = (statement * comment)
 
 (*
 datatype lgclline = LclVarDecl of var * vbtype

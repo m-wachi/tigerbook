@@ -43,18 +43,19 @@ fun stmtToStr (stmt: statement) =
             "LclVarDecl var=" ^ (varToStr v)
         | DefProc (sym, lines) =>
             let
-                val procHdr = "void " ^ (symToStr sym) ^ "()\n{" 
+	        val procName = symToStr sym
+                val procHdr = "DefProc " ^ procName ^ "()\n" 
                 val body = lglinesToStr lines
             in
-                procHdr ^ body ^ "}\n"
+                procHdr ^ body ^ "End DefProc " ^ procName
             end
+	| BlankLine => "BlankLine"
         | _ => "unexpected stmt. stmtToStr."
 
-fun lglineToStr (stmt: statement, cmnt: comment) =
+and lglineToStr (stmt: statement, cmnt: comment) =
     "statement: " ^ (stmtToStr stmt) 
         ^ "\ncomment: " ^ cmnt ^ "\n"
-
-fun lglinesToStr (lglines: lgline list) =
+and lglinesToStr (lglines: lgline list) =
     if null lglines then ""
     else
         let 

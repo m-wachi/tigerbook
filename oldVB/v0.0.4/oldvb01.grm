@@ -49,7 +49,7 @@ logical_line:
     (* | syms                           (syms) *)
     | COMMENT LINE_TERM              (Absyn.BlankLine, COMMENT)
     | LINE_TERM                      (Absyn.BlankLine, "")
-    | SUB ID LINE_TERM logical_lines END SUB LINE_TERM    ((Absyn.ProcStart ((Symbol.symbol ID), logical_lines)), "")
+    | SUB ID LINE_TERM logical_lines END SUB LINE_TERM    ((Absyn.DefProc ((Symbol.symbol ID), logical_lines)), "")
 
 
 statement:

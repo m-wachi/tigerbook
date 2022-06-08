@@ -17,7 +17,7 @@ datatype exp = VarExp of var
 
 datatype statement = LclVarDecl of var * vbtype
         | AssignStmt of var * exp
-        | ProcStart of symbol * (lgline list)
+        | DefProc of symbol * (lgline list)
         | BlankLine
 withtype lgline = (statement * comment)
 
@@ -41,11 +41,27 @@ fun stmtToStr (stmt: statement) =
     case stmt of
         LclVarDecl (v, t) =>
             "LclVarDecl var=" ^ (varToStr v)
-            | _ => "unexpected stmt. stmtToStr."
+        | DefProc (sym, lines) =>
+            let
+                val procHdr = "void " ^ (symToStr sym) ^ "()\n{" 
+                val body = lglinesToStr lines
+            in
+                procHdr ^ body ^ "}\n"
+            end
+        | _ => "unexpected stmt. stmtToStr."
 
 fun lglineToStr (stmt: statement, cmnt: comment) =
     "statement: " ^ (stmtToStr stmt) 
         ^ "\ncomment: " ^ cmnt ^ "\n"
+
+fun lglinesToStr (lglines: lgline list) =
+    if null lglines then ""
+    else
+        let 
+            val lgl1::lgls = lglines
+        in
+            (lglineToStr lgl1) ^ (lglinesToStr lgls)
+        end
 
 end
         

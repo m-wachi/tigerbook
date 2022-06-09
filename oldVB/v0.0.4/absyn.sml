@@ -37,6 +37,12 @@ fun varToStr (v: var) =
     case v of
         SimpleVar (sym, _) => symToStr sym
 
+fun expToStr (e: exp) =
+    case e of 
+        VarExp v => varToStr v
+        | IntExp n => Int.toString n
+        | StringExp (s, p) =>  "\"" ^ s ^ "\""
+        
 fun stmtToStr (stmt: statement) =
     case stmt of
         LclVarDecl (v, t) =>
@@ -49,12 +55,15 @@ fun stmtToStr (stmt: statement) =
             in
                 procHdr ^ body ^ "End DefProc " ^ procName
             end
-	| BlankLine => "BlankLine"
-        | _ => "unexpected stmt. stmtToStr."
+        | AssignStmt (v, e) =>
+            "AssignStmt right=" ^ (varToStr v) ^ ", left=" ^ (expToStr e)
+        | BlankLine => "BlankLine"
+
 
 and lglineToStr (stmt: statement, cmnt: comment) =
     "statement: " ^ (stmtToStr stmt) 
         ^ "\ncomment: " ^ cmnt ^ "\n"
+
 and lglinesToStr (lglines: lgline list) =
     if null lglines then ""
     else

@@ -18,6 +18,7 @@ datatype exp = VarExp of var
 datatype statement = LclVarDecl of var * vbtype
         | AssignStmt of var * exp
         | DefProc of symbol * (lgline list)
+        | CallProc of symbol * (exp list)
         | BlankLine
 withtype lgline = (statement * comment)
 
@@ -57,8 +58,19 @@ fun stmtToStr (stmt: statement) =
             end
         | AssignStmt (v, e) =>
             "AssignStmt right=" ^ (varToStr v) ^ ", left=" ^ (expToStr e)
+        | CallProc (sym, params) =>
+            "CallProc " ^ (symToStr sym) ^ "(" ^ (procParamsToStr params) ^ ")"
         | BlankLine => "BlankLine"
 
+and procParamsToStr (params: exp list) =
+    if null params then ""
+    else
+        let
+            val p::ps = params
+        in
+            (expToStr p) ^ "," ^ (procParamsToStr ps)
+        end
+         
 
 and lglineToStr (stmt: statement, cmnt: comment) =
     "statement: " ^ (stmtToStr stmt) 

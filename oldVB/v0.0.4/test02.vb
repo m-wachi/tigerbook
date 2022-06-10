@@ -1,10 +1,10 @@
-Sub Proc
+Sub Main
 
     Dim a As String
 
     a = "Hello world."
     
-   Debug.Print = 10
+    Msgbox "hello"
 
 End Sub
 

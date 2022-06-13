@@ -11,6 +11,6 @@ then smlnj interpriter
   or
   - Oldvb2Cs01.translate01 "test02.vb";
   or
-  - Oldvb2Cs01.translate01 ("test02.vb", "test02.cs");
+  - Oldvb2Cs01.translate02 ("test02.vb", "test02.cs");
  
 

@@ -1,0 +1,5 @@
+foldl (fn (x, xs) => x ^ "," ^ xs) "" ["aaa","bbb","ccc"];
+-> val it = "ccc,bbb,aaa," : string
+foldr (fn (x, xs) => x ^ "," ^ xs) "" ["aaa","bbb","ccc"];
+-> val it = "aaa,bbb,ccc," : string
+

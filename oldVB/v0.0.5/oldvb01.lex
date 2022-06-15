@@ -23,6 +23,8 @@ ws = [\ \t];
 %full
 %%
 <INITIAL>\n       => (pos := (!pos) + 1; Tokens.LINE_TERM(yypos, yypos));
+<INITIAL>"("      => (Tokens.LPAREN(yypos, yypos));
+<INITIAL>")"      => (Tokens.RPAREN(yypos, yypos));
 <INITIAL>"'"      => (YYBEGIN COMMENT; continue());
 <INITIAL>"\"\""   => (Tokens.STRING ("", yypos, yypos));
 <INITIAL>"\""     => (YYBEGIN STR; continue());

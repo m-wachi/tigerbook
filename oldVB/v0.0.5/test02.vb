@@ -1,4 +1,4 @@
-Sub Main
+Sub Main()
 
     Dim a As String
 

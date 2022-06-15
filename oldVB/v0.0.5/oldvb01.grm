@@ -13,6 +13,7 @@ fun printInt i = print (Int.toString i)
     | END
     | TY_STRING
     | TY_INT
+    | LPAREN | RPAREN
     | LINE_TERM
     | COMMENT of string
     | EOF
@@ -47,8 +48,14 @@ logical_line:
     | statement LINE_TERM      ((statement), "")
     | COMMENT LINE_TERM              (Absyn.BlankLine, COMMENT)
     | LINE_TERM                      (Absyn.BlankLine, "")
-    | SUB ID LINE_TERM logical_lines END SUB LINE_TERM    ((Absyn.DefProc ((Symbol.symbol ID), logical_lines)), "")
+    | SUB ID LPAREN RPAREN LINE_TERM logical_lines END SUB LINE_TERM    ((Absyn.DefProc ((Symbol.symbol ID), logical_lines)), "")
 
+def_params: 
+	([])          (* how to blank or nothing *)
+	| def_param   ([def_param])
+	| def_params def param (def_params @ [def_param])
+	
+def_param: ID AS vbtype (??????)
 
 statement:
     local_var_decl                   (local_var_decl)

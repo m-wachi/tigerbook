@@ -7,7 +7,9 @@ type comment = string
 
 datatype var = SimpleVar of symbol * pos
 
-datatype vbtype = VbTyString | VbTyInt
+datatype vbprimtype = VbTyString | VbTyInt
+
+datatype vbtype = VbTySimple of vbprimtype  | VbTyArray of vbprimtype
 
 datatype oper = EqOp | NeqOp
 
@@ -29,10 +31,15 @@ withtype lgline = (statement * comment)
 fun symToStr (sym: Symbol.symbol) =
     Symbol.name sym
 
-fun vbtypeToStr (t: vbtype) : string =
+fun vbprimtypeToStr (t: vbprimtype) : string =
     case t of 
         VbTyString => "String"
         | VbTyInt => "Integer"
+
+fun vbtypeToStr (t: vbtype) : string =
+    case t of 
+        VbTySimple pt => vbprimtypeToStr pt
+        | VbTyArray pt => "Array of " ^ (vbprimtypeToStr pt)
 
 fun varToStr (v: var) =
     case v of
@@ -53,8 +60,9 @@ fun stmtToStr (stmt: statement) =
             "LclVarDecl var=" ^ (varToStr v)
         | DefProc (sym, params, lines) =>
             let
-	         val procName = symToStr sym
-                val procHdr = "DefProc " ^ procName ^ "()\n" 
+                val procName = symToStr sym
+                val sParam = MwUtil.strJoin (", ", (map defparamToStr params))
+                val procHdr = "DefProc " ^ procName ^ "(" ^ sParam ^ ")\n" 
                 val body = lglinesToStr lines
             in
                 procHdr ^ body ^ "End DefProc " ^ procName

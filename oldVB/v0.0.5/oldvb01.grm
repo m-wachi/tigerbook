@@ -71,11 +71,13 @@ proc_params:
      
 local_var_decl: 
     DIM ID AS vbtype (Absyn.LclVarDecl ((Absyn.SimpleVar(Symbol.symbol ID, 0)), (vbtype)))
-
+    | DIM ID LPAREN RLAPAREN AS vbtype (Absyn.LclVarDecl ((Absyn.SimpleVar(Symbol.symbol ID, 0)), (vbtype)))
+    
 vbtype:
     TY_STRING (Absyn.VbTyString)
     | TY_INT (Absyn.VbTyInt)
   
 exp: INT                         (Absyn.IntExp INT)
     | STRING                     (Absyn.StringExp (STRING, 0))
+
 

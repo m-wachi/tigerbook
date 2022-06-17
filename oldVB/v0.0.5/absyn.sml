@@ -5,8 +5,11 @@ type pos = int   and   symbol = Symbol.symbol
 
 type comment = string
 
+(*
 type field = {name: symbol, escape: bool ref, 
 		typ: symbol, pos: pos}
+*)
+
 
 datatype var = SimpleVar of symbol * pos
 
@@ -14,13 +17,17 @@ datatype vbprimtype = VbTyString | VbTyInt
 
 datatype vbtype = VbTySimple of vbprimtype  | VbTyArray of vbprimtype
 
+type field = {name: symbol, escape: bool ref, vbty: vbtype, pos: pos}
+
 datatype oper = EqOp | NeqOp
 
 datatype exp = VarExp of var
         | IntExp of int
         | StringExp of string * pos
 
+(*
 datatype defparam = DefParam of var * vbtype
+*)
 (*
 datatype statement = LclVarDecl of var * vbtype
         | AssignStmt of var * exp
@@ -64,9 +71,13 @@ fun expToStr (e: exp) =
         | IntExp n => Int.toString n
         | StringExp (s, p) =>  "\"" ^ s ^ "\""
 
+(*
 fun defparamToStr (DefParam (v: var, t: vbtype)) =
     (varToStr v) ^ ":" ^ (vbtypeToStr t)
-
+*)
+fun fieldToStr (fld: field) =
+    (symToStr (#name fld)) ^ ":" ^ (vbtypeToStr (#vbty fld))
+   
 (*        
 fun stmtToStr (stmt: statement) =
     case stmt of
@@ -102,7 +113,7 @@ fun stmtToStr (stmt: statement) =
 and procDecToStr r =
     let
         val procName = symToStr (#name r)
-        val sParam = ""
+        val sParam = MwUtil.strJoin (", ", (map fieldToStr (#params r)))
         val procHdr = "ProcDec " ^ procName ^ "(" ^ sParam ^ ")\n" 
         val body = lglinesToStr (#body r)
     in

@@ -24,8 +24,8 @@ fun printInt i = print (Int.toString i)
        | logical_line of Absyn.lgline
        | local_var_decl of Absyn.statement
        | statement of Absyn.statement
-       | def_params of Absyn.defparam list
-       | def_param of Absyn.defparam
+       | def_params of Absyn.field list
+       | def_param of Absyn.field
        | proc_params of Absyn.exp list
        | exp of Absyn.exp
        | vbtype of Absyn.vbtype
@@ -62,7 +62,7 @@ logical_line:
     | COMMENT LINE_TERM              (Absyn.BlankLine, COMMENT)
     | LINE_TERM                      (Absyn.BlankLine, "")
     | SUB ID LPAREN def_params RPAREN LINE_TERM logical_lines END SUB LINE_TERM    
-        (Absyn.ProcDec {name=(Symbol.symbol ID), params=nil, body=logical_lines, pos=0}, "")
+        (Absyn.ProcDec {name=(Symbol.symbol ID), params=(def_params), body=logical_lines, pos=0}, "")
 
 
 def_params: 
@@ -70,7 +70,10 @@ def_params:
     | def_param COMMA def_params  (def_param :: def_params)
     | ([])
 	
+(*
 def_param: ID AS vbtype (Absyn.DefParam ((Absyn.SimpleVar(Symbol.symbol ID, 0)), (vbtype)))
+*)
+def_param: ID AS vbtype ({name=(Symbol.symbol ID), escape=ref false, vbty=(vbtype), pos=0})
 
 statement:
     local_var_decl                   (local_var_decl)

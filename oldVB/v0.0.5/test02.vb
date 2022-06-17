@@ -1,4 +1,4 @@
-Sub Main(arg As String)
+Sub Main(arg() As String)
 
     Dim a As String
     Dim b() As Integer

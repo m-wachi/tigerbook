@@ -18,6 +18,14 @@ struct
             Absyn.VbTySimple pt => convVbPrimType pt
             | Absyn.VbTyArray pt => (convVbPrimType pt) ^ "[]" 
 
+    fun convProcParamDec (param: Absyn.field) =
+        let
+            val sType = convVbType (#vbty param)
+            val sParamName = convSym (#name param)
+        in
+            sType ^ " " ^ sParamName
+        end
+        
     fun convVar (v: Absyn.var) =
         case v of
             Absyn.SimpleVar (sym, _) => convSym sym
@@ -54,7 +62,8 @@ struct
     and convProcDec r = 
         let
             val procName = convSym (#name r)
-            val procHdr = "static void " ^ procName ^ "()\n{\n" 
+            val sParam = MwUtil.strJoin (", ", (map convProcParamDec (#params r)))
+            val procHdr = "static void " ^ procName ^ "(" ^ sParam ^ ")\n{\n" 
             val body = convLglines (#body r)
         in
             procHdr ^ body ^ "}"

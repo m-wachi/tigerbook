@@ -46,13 +46,24 @@ logical_lines:
     logical_line                       ([logical_line])
     | logical_lines logical_line       (logical_lines @ [logical_line])
 
+(*
 logical_line: 
     statement COMMENT LINE_TERM      ((statement), COMMENT)
     | statement LINE_TERM      ((statement), "")
     | COMMENT LINE_TERM              (Absyn.BlankLine, COMMENT)
     | LINE_TERM                      (Absyn.BlankLine, "")
     | SUB ID LPAREN def_params RPAREN LINE_TERM logical_lines END SUB LINE_TERM    
-        ((Absyn.DefProc ((Symbol.symbol ID), (def_params), logical_lines)), "")
+        ((Absyn.ProcDec ((Symbol.symbol ID), (def_params), logical_lines)), "")
+*)
+
+logical_line: 
+    statement COMMENT LINE_TERM      ((statement), COMMENT)
+    | statement LINE_TERM      ((statement), "")
+    | COMMENT LINE_TERM              (Absyn.BlankLine, COMMENT)
+    | LINE_TERM                      (Absyn.BlankLine, "")
+    | SUB ID LPAREN def_params RPAREN LINE_TERM logical_lines END SUB LINE_TERM    
+        (Absyn.ProcDec {name=(Symbol.symbol ID), params=nil, body=logical_lines, pos=0}, "")
+
 
 def_params: 
     def_param   ([def_param])
@@ -71,11 +82,11 @@ proc_params:
      
 local_var_decl: 
     DIM ID AS vbtype (Absyn.LclVarDecl ((Absyn.SimpleVar(Symbol.symbol ID, 0)), (vbtype)))
-    | DIM ID LPAREN RLAPAREN AS vbtype (Absyn.LclVarDecl ((Absyn.SimpleVar(Symbol.symbol ID, 0)), (vbtype)))
+    | DIM ID LPAREN RPAREN AS vbtype (Absyn.LclVarDecl ((Absyn.SimpleVar(Symbol.symbol ID, 0)), (vbtype)))
     
 vbtype:
-    TY_STRING (Absyn.VbTyString)
-    | TY_INT (Absyn.VbTyInt)
+    TY_STRING (Absyn.VbTySimple Absyn.VbTyString)
+    | TY_INT  (Absyn.VbTySimple Absyn.VbTyInt)
   
 exp: INT                         (Absyn.IntExp INT)
     | STRING                     (Absyn.StringExp (STRING, 0))

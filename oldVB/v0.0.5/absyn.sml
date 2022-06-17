@@ -5,6 +5,9 @@ type pos = int   and   symbol = Symbol.symbol
 
 type comment = string
 
+type field = {name: symbol, escape: bool ref, 
+		typ: symbol, pos: pos}
+
 datatype var = SimpleVar of symbol * pos
 
 datatype vbprimtype = VbTyString | VbTyInt
@@ -18,14 +21,24 @@ datatype exp = VarExp of var
         | StringExp of string * pos
 
 datatype defparam = DefParam of var * vbtype
-
+(*
 datatype statement = LclVarDecl of var * vbtype
         | AssignStmt of var * exp
-        | DefProc of symbol * (defparam list) * (lgline list)
+        | ProcDec of symbol * (defparam list) * (lgline list)
         | CallProc of symbol * (exp list)
         | BlankLine
 withtype lgline = (statement * comment)
+*)
 
+datatype statement = LclVarDecl of var * vbtype
+        | AssignStmt of var * exp
+        | ProcDec of {
+            name: symbol, params: field list,
+            body: lgline list,
+            pos: pos}
+        | CallProc of symbol * (exp list)
+        | BlankLine
+withtype lgline = (statement * comment)
 
 
 fun symToStr (sym: Symbol.symbol) =
@@ -53,25 +66,48 @@ fun expToStr (e: exp) =
 
 fun defparamToStr (DefParam (v: var, t: vbtype)) =
     (varToStr v) ^ ":" ^ (vbtypeToStr t)
-        
+
+(*        
 fun stmtToStr (stmt: statement) =
     case stmt of
         LclVarDecl (v, t) =>
             "LclVarDecl var=" ^ (varToStr v)
-        | DefProc (sym, params, lines) =>
+        | ProcDec (sym, params, lines) =>
             let
                 val procName = symToStr sym
                 val sParam = MwUtil.strJoin (", ", (map defparamToStr params))
-                val procHdr = "DefProc " ^ procName ^ "(" ^ sParam ^ ")\n" 
+                val procHdr = "ProcDec " ^ procName ^ "(" ^ sParam ^ ")\n" 
                 val body = lglinesToStr lines
             in
-                procHdr ^ body ^ "End DefProc " ^ procName
+                procHdr ^ body ^ "End ProcDec " ^ procName
             end
         | AssignStmt (v, e) =>
             "AssignStmt right=" ^ (varToStr v) ^ ", left=" ^ (expToStr e)
         | CallProc (sym, params) =>
             "CallProc " ^ (symToStr sym) ^ "(" ^ (procParamsToStr params) ^ ")"
         | BlankLine => "BlankLine"
+*)
+
+fun stmtToStr (stmt: statement) =
+    case stmt of
+        LclVarDecl (v, t) =>
+            "LclVarDecl var=" ^ (varToStr v)
+        | ProcDec r => procDecToStr r
+        | AssignStmt (v, e) =>
+            "AssignStmt right=" ^ (varToStr v) ^ ", left=" ^ (expToStr e)
+        | CallProc (sym, params) =>
+            "CallProc " ^ (symToStr sym) ^ "(" ^ (procParamsToStr params) ^ ")"
+        | BlankLine => "BlankLine"
+
+and procDecToStr r =
+    let
+        val procName = symToStr (#name r)
+        val sParam = ""
+        val procHdr = "ProcDec " ^ procName ^ "(" ^ sParam ^ ")\n" 
+        val body = lglinesToStr (#body r)
+    in
+        procHdr ^ body ^ "End ProcDec " ^ procName
+    end
 
 and procParamsToStr (params: exp list) =
     if null params then ""

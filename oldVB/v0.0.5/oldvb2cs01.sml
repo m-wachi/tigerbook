@@ -8,10 +8,15 @@ struct
 
     fun convSym (sym: Symbol.symbol) = Symbol.name sym
 
-    fun convVbType (t: Absyn.vbtype) =
+    fun convVbPrimType (t: Absyn.vbprimtype) =
         case t of
             Absyn.VbTyString => "string"
             | Absyn.VbTyInt => "int"
+
+    fun convVbType (t: Absyn.vbtype) =
+        case t of
+            Absyn.VbTySimple pt => convVbPrimType pt
+            | Absyn.VbTyArray pt => (convVbPrimType pt) ^ "[]" 
 
     fun convVar (v: Absyn.var) =
         case v of
@@ -37,22 +42,23 @@ struct
         case stmt of
             Absyn.LclVarDecl (v, t) =>
                 (convVbType t) ^ " " ^ (convVar v) ^ ";"
+            | Absyn.ProcDec r => convProcDec r
             | Absyn.BlankLine => ""
             | Absyn.AssignStmt (v, e) => (convVar v) ^ " = " ^ (convExp e) ^ ";"
-            | Absyn.DefProc (sym, lines) =>
-                let
-	             val procName = convSym sym
-                    val procHdr = "static void " ^ procName ^ "()\n{\n" 
-                    val body = convLglines lines
-                in
-                    procHdr ^ body ^ "}"
-                end
             | Absyn.CallProc (sym, params) =>
                 let
                     val procName = convProcName (convSym sym)
                 in
                      procName ^ "(" ^ (convProcParams params) ^ ");"
                 end
+    and convProcDec r = 
+        let
+            val procName = convSym (#name r)
+            val procHdr = "static void " ^ procName ^ "()\n{\n" 
+            val body = convLglines (#body r)
+        in
+            procHdr ^ body ^ "}"
+        end
 
     and convLgline (stmt: Absyn.statement, cmnt: Absyn.comment) =
         let 

@@ -37,6 +37,8 @@ struct
             | Absyn.StringExp (s, _) => "\"" ^ s ^ "\""
 
     fun convProcParams (params: Absyn.exp list) =
+        MwUtil.strJoin (", ", (map convExp params))
+(*
         if null params then ""
         else
             let
@@ -44,7 +46,7 @@ struct
             in
                 (convExp p) ^ "," ^ (convProcParams ps)
             end
-
+*)
      
     fun convStmt (stmt: Absyn.statement) =
         case stmt of
@@ -87,7 +89,11 @@ struct
             end
 
     fun convAll (os: TextIO.outstream, ast) =
-        TextIO.output (os, (convLglines ast))
+        (TextIO.output (os, "namespace Oldvb2Cs01\n{\n");
+        TextIO.output (os, "class Program\n{\n");
+        TextIO.output (os, (convLglines ast));
+        TextIO.output (os, "}\n");
+        TextIO.output (os, "}\n"))
 
     fun translate01 (filename: string) =
         let

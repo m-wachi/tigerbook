@@ -1,0 +1,96 @@
+(* val table = ref (nil: (string * int) list) *)
+type table = string -> int
+val emptytable = fn j => raise Fail("uninitialized var: " ^ j)
+fun printInt i = print (Int.toString i)
+%%
+
+%term ID of string | INT of int | STRING of string
+    | PRINT of string 
+    | EQUAL
+    | DIM
+    | AS
+    | SUB
+    | END
+    | TY_STRING
+    | TY_INT
+    | LPAREN | RPAREN
+    | COMMA
+    | LINE_TERM
+    | COMMENT of string
+    | EOF
+
+%nonterm  prog of Absyn.lgline list
+       | logical_lines of Absyn.lgline list
+       | logical_line of Absyn.lgline
+       | local_var_decl of Absyn.statement
+       | statement of Absyn.statement
+       | subroutine_declaration of Absyn.statement
+       | procedure_parameters of Absyn.field list
+       | procedure_parameter of Absyn.field
+       | proc_params of Absyn.exp list
+       | exp of Absyn.exp
+       | vbtype of Absyn.vbtype
+       | vbprimtype of Absyn.vbprimtype
+
+%name Oldvb01
+
+%verbose
+
+%start prog
+%eop EOF
+%noshift EOF
+%pos int
+
+%%
+prog: logical_lines                   (logical_lines)
+
+logical_lines: 
+    logical_line                       ([logical_line])
+    | logical_lines logical_line       (logical_lines @ [logical_line])
+
+logical_line: 
+    statement COMMENT LINE_TERM      ((statement), COMMENT)
+    | statement LINE_TERM      ((statement), "")
+    | COMMENT LINE_TERM              (Absyn.BlankLine, COMMENT)
+    | LINE_TERM                      (Absyn.BlankLine, "")
+    | subroutine_declaration LINE_TERM   ((subroutine_declaration), "")
+    
+subroutine_declaration:
+    SUB ID LPAREN procedure_parameters RPAREN LINE_TERM logical_lines END SUB
+        (Absyn.ProcDec {name=(Symbol.symbol ID), params=(procedure_parameters), body=logical_lines, pos=0})
+
+procedure_parameters: 
+    procedure_parameter   ([procedure_parameter])
+    | procedure_parameter COMMA procedure_parameters  (procedure_parameter :: procedure_parameters)
+    | ([])
+	
+procedure_parameter: 
+    ID AS vbprimtype ({name=(Symbol.symbol ID), escape=ref false, vbty=(Absyn.VbTySimple (vbprimtype)), pos=0})
+    | ID LPAREN RPAREN AS vbprimtype 
+        ({name=(Symbol.symbol ID), escape=ref false, vbty=(Absyn.VbTyArray (vbprimtype)), pos=0})
+
+statement:
+    local_var_decl                   (local_var_decl)
+    | ID EQUAL exp                   (Absyn.AssignStmt (Absyn.SimpleVar(Symbol.symbol ID, 0), exp))
+    | ID proc_params                 (Absyn.CallProc ((Symbol.symbol ID), (proc_params)))
+
+proc_params:
+     exp          ([exp])
+     
+local_var_decl: 
+    DIM ID AS vbprimtype (Absyn.LclVarDecl ((Absyn.SimpleVar(Symbol.symbol ID, 0)), (Absyn.VbTySimple (vbprimtype))))
+    | DIM ID LPAREN RPAREN AS vbprimtype (Absyn.LclVarDecl ((Absyn.SimpleVar(Symbol.symbol ID, 0)), (Absyn.VbTyArray (vbprimtype))))
+    
+vbtype:
+    TY_STRING (Absyn.VbTySimple Absyn.VbTyString)
+    | TY_INT  (Absyn.VbTySimple Absyn.VbTyInt)
+
+vbprimtype:
+    TY_STRING (Absyn.VbTyString)
+    | TY_INT  (Absyn.VbTyInt)
+
+  
+exp: INT                         (Absyn.IntExp INT)
+    | STRING                     (Absyn.StringExp (STRING, 0))
+
+

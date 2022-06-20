@@ -53,7 +53,14 @@ struct
             Absyn.LclVarDecl (v, t) => convLclVarDecl (os, idt, (v, t))
             | Absyn.ProcDec r => convProcDec (os, idt, r)
             | Absyn.BlankLine => (TextIO.output (os, "\n"); "")
-            | Absyn.AssignStmt (v, e) => (TextIO.output (os, ((convVar v) ^ " = " ^ (convExp e) ^ ";\n")); "")
+            | Absyn.AssignStmt (v, e) => 
+                let
+                    val sIdt = MwUtil.repeatStr "    " idt
+                    val s = (convVar v) ^ " = " ^ (convExp e) ^ ";\n"
+                in
+                    TextIO.output (os, sIdt ^ s); 
+                    ""
+                end
             | Absyn.CallProc (sym, params) =>
                 let
                     val procName = convProcName (convSym sym)
@@ -73,37 +80,21 @@ struct
                 
     and convProcDec (os: TextIO.outstream, idt:int, r) = 
         let
+            val sIdt = MwUtil.repeatStr "    " idt
             val procName = convSym (#name r)
             val sParam = MwUtil.strJoin (", ", (map convProcParamDec (#params r)))
-            val procHdr = "static void " ^ procName ^ "(" ^ sParam ^ ")\n{\n" 
+            val procHdr = "static void " ^ procName ^ "(" ^ sParam ^ ")\n" 
         in
-            TextIO.output (os, procHdr);
-            convLglines (os, idt, (#body r))
-            (* procHdr ^ body ^ "}" *)
+            TextIO.output (os, (sIdt ^ procHdr));
+            TextIO.output (os, (sIdt ^ "{\n"));
+            convLglines (os, idt+1, (#body r));
+            TextIO.output (os, (sIdt ^ "}\n"));
+            ""
         end
 
     and convLgline (os: TextIO.outstream, idt:int, (stmt: Absyn.statement, cmnt: Absyn.comment)) =
-        (*
-        let 
-            val sStmt = convStmt (os, idt, stmt)
-        in
-            if "" = cmnt then sStmt ^ "\n"
-            else sStmt ^ "//" ^ cmnt ^ "\n"
-        end    
-        *)
         (convStmt (os, idt, stmt);
         TextIO.output (os, cmnt))
-
-(*
-    and convLglines (lines: Absyn.lgline list) =
-        if null lines then ""
-        else
-            let 
-                val ln::lns = lines
-            in
-                (convLgline ln) ^ (convLglines lns)
-            end
-*)
 
     and convLglines (os: TextIO.outstream, idt:int, lines: Absyn.lgline list) =
         if null lines then ""
@@ -121,7 +112,7 @@ struct
         (TextIO.output (os, "namespace Oldvb2Cs01\n{\n");
         TextIO.output (os, "class Program\n{\n");
         (* TextIO.output (os, (convLglines ast)); *)
-        convLglines (os, 0, ast);
+        convLglines (os, 1, ast);
         TextIO.output (os, "}\n");
         TextIO.output (os, "}\n"))
 

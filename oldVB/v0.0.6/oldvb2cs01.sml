@@ -1,6 +1,14 @@
 structure Oldvb2Cs01 = 
 struct
 
+    fun outputWithIndent (os: TextIO.outstream, idt:int, s: string) =
+        let
+            val AN_INDENT = "    "
+            val sIndent = MwUtil.repeatStr AN_INDENT idt
+        in
+            TextIO.output (os, (sIndent ^ s))
+        end
+
     fun convProcName (procName: string) : string =     
         case procName of
             "Msgbox" => "Console.WriteLine"
@@ -38,15 +46,6 @@ struct
 
     fun convProcParams (params: Absyn.exp list) =
         MwUtil.strJoin (", ", (map convExp params))
-(*
-        if null params then ""
-        else
-            let
-                val p::ps = params
-            in
-                (convExp p) ^ "," ^ (convProcParams ps)
-            end
-*)
      
     fun convStmt (os: TextIO.outstream, idt:int, stmt: Absyn.statement) =
         case stmt of
@@ -55,10 +54,11 @@ struct
             | Absyn.BlankLine => (TextIO.output (os, "\n"); "")
             | Absyn.AssignStmt (v, e) => 
                 let
-                    val sIdt = MwUtil.repeatStr "    " idt
+                    (* val sIdt = MwUtil.repeatStr AN_INDENT idt *)
                     val s = (convVar v) ^ " = " ^ (convExp e) ^ ";\n"
                 in
-                    TextIO.output (os, sIdt ^ s); 
+                    (* TextIO.output (os, sIdt ^ s);  *)
+                    outputWithIndent (os, idt, s);
                     ""
                 end
             | Absyn.CallProc (sym, params) =>
@@ -66,29 +66,34 @@ struct
                     val procName = convProcName (convSym sym)
                     val sProcStmt = procName ^ "(" ^ (convProcParams params) ^ ");\n"
                 in
-                     TextIO.output (os, sProcStmt);
+                     (* TextIO.output (os, sProcStmt); *)
+                     outputWithIndent (os, idt, sProcStmt);
                      ""
                 end
 
     and convLclVarDecl (os: TextIO.outstream, idt:int, (v, t)) =
         let
             val sStmt = (convVbType t) ^ " " ^ (convVar v) ^ ";\n"
+            (* val sIdt = MwUtil.repeatStr AN_INDENT idt *)
         in
-            TextIO.output (os, sStmt);
+            (* TextIO.output (os, (sIdt ^ sStmt)); *)
+            outputWithIndent (os, idt, sStmt);
             ""
         end
                 
     and convProcDec (os: TextIO.outstream, idt:int, r) = 
         let
-            val sIdt = MwUtil.repeatStr "    " idt
             val procName = convSym (#name r)
             val sParam = MwUtil.strJoin (", ", (map convProcParamDec (#params r)))
             val procHdr = "static void " ^ procName ^ "(" ^ sParam ^ ")\n" 
         in
-            TextIO.output (os, (sIdt ^ procHdr));
-            TextIO.output (os, (sIdt ^ "{\n"));
+            (* TextIO.output (os, (sIdt ^ procHdr));
+            TextIO.output (os, (sIdt ^ "{\n")); *)
+            outputWithIndent (os, idt, procHdr);
+            outputWithIndent (os, idt, "{\n");
             convLglines (os, idt+1, (#body r));
-            TextIO.output (os, (sIdt ^ "}\n"));
+            (* TextIO.output (os, (sIdt ^ "}\n")); *)
+            outputWithIndent (os, idt, "}\n");
             ""
         end
 

@@ -51,11 +51,11 @@ struct
         case stmt of
             Absyn.LclVarDecl (v, t) => convLclVarDecl (os, idt, (v, t))
             | Absyn.ProcDec r => convProcDec (os, idt, r)
-            | Absyn.BlankLine => (TextIO.output (os, "\n"); "")
+            | Absyn.BlankLine => (outputWithIndent (os, idt, "");"")
             | Absyn.AssignStmt (v, e) => 
                 let
                     (* val sIdt = MwUtil.repeatStr AN_INDENT idt *)
-                    val s = (convVar v) ^ " = " ^ (convExp e) ^ ";\n"
+                    val s = (convVar v) ^ " = " ^ (convExp e) ^ ";"
                 in
                     (* TextIO.output (os, sIdt ^ s);  *)
                     outputWithIndent (os, idt, s);
@@ -64,7 +64,7 @@ struct
             | Absyn.CallProc (sym, params) =>
                 let
                     val procName = convProcName (convSym sym)
-                    val sProcStmt = procName ^ "(" ^ (convProcParams params) ^ ");\n"
+                    val sProcStmt = procName ^ "(" ^ (convProcParams params) ^ ");"
                 in
                      (* TextIO.output (os, sProcStmt); *)
                      outputWithIndent (os, idt, sProcStmt);
@@ -73,7 +73,7 @@ struct
 
     and convLclVarDecl (os: TextIO.outstream, idt:int, (v, t)) =
         let
-            val sStmt = (convVbType t) ^ " " ^ (convVar v) ^ ";\n"
+            val sStmt = (convVbType t) ^ " " ^ (convVar v) ^ ";"
             (* val sIdt = MwUtil.repeatStr AN_INDENT idt *)
         in
             (* TextIO.output (os, (sIdt ^ sStmt)); *)
@@ -98,9 +98,13 @@ struct
         end
 
     and convLgline (os: TextIO.outstream, idt:int, (stmt: Absyn.statement, cmnt: Absyn.comment)) =
-        (convStmt (os, idt, stmt);
-        TextIO.output (os, cmnt))
-
+        let
+            val s = if "" <> cmnt then ("// " ^ cmnt) else ""
+        in
+            convStmt (os, idt, stmt);
+            TextIO.output (os, s ^ "\n")
+        end
+        
     and convLglines (os: TextIO.outstream, idt:int, lines: Absyn.lgline list) =
         if null lines then ""
         else

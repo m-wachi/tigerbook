@@ -33,6 +33,12 @@ struct
         in
             sType ^ " " ^ sParamName
         end
+
+    fun convOper (ope: Absyn.oper) =
+        case ope of
+            Absyn.EqOp => "=="
+            | Absyn.NeqOp => "!="
+            | Absyn.AmpOp => "+"
         
     fun convVar (v: Absyn.var) =
         case v of
@@ -43,7 +49,18 @@ struct
             Absyn.VarExp v => convVar v
             | Absyn.IntExp i => Int.toString i
             | Absyn.StringExp (s, _) => "\"" ^ s ^ "\""
+            | Absyn.OpExp reco => convOpExp reco
 
+    and convOpExp reco =
+        let
+            val sLeft = convExp (#left reco)
+            val sOper = convOper (#oper reco)
+            val sRight = convExp (#right reco)
+        in
+            sLeft ^ " " ^ sOper ^ " " ^ sRight 
+        end
+
+             
     fun convProcParams (params: Absyn.exp list) =
         MwUtil.strJoin (", ", (map convExp params))
      
@@ -99,7 +116,7 @@ struct
 
     and convLgline (os: TextIO.outstream, idt:int, (stmt: Absyn.statement, cmnt: Absyn.comment)) =
         let
-            val s = if "" <> cmnt then ("// " ^ cmnt) else ""
+            val s = if "" <> cmnt then ("//" ^ cmnt) else ""
         in
             convStmt (os, idt, stmt);
             TextIO.output (os, s ^ "\n")

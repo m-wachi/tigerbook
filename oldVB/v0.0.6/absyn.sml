@@ -19,12 +19,12 @@ datatype vbtype = VbTySimple of vbprimtype  | VbTyArray of vbprimtype
 
 type field = {name: symbol, escape: bool ref, vbty: vbtype, pos: pos}
 
-datatype oper = EqOp | NeqOp
+datatype oper = EqOp | NeqOp | AmpOp
 
 datatype exp = VarExp of var
         | IntExp of int
         | StringExp of string * pos
-
+        | OpExp of {left: exp, oper: oper, right: exp, pos: pos}
 (*
 datatype defparam = DefParam of var * vbtype
 *)
@@ -65,11 +65,27 @@ fun varToStr (v: var) =
     case v of
         SimpleVar (sym, _) => symToStr sym
 
+fun operToStr (ope: oper) =
+    case ope of
+        EqOp => "EqOp"
+        | NeqOp => "NeqOp"
+        | AmpOp => "AmpOp"
+
 fun expToStr (e: exp) =
     case e of 
         VarExp v => varToStr v
         | IntExp n => Int.toString n
         | StringExp (s, p) =>  "\"" ^ s ^ "\""
+        | OpExp reco => opExpToStr reco
+
+and opExpToStr reco =
+    let
+        val sLeft = expToStr (#left reco)
+        val sOper = operToStr (#oper reco)
+        val sRight = expToStr (#right reco)
+    in
+        "OpExp left: " ^ sLeft ^ ", oper: " ^ sOper ^ ", right: " ^ sRight
+    end
 
 (*
 fun defparamToStr (DefParam (v: var, t: vbtype)) =

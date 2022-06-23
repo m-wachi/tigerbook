@@ -1,15 +1,15 @@
 '
-' ƒƒCƒ“ŠÖ”
+' ãƒ¡ã‚¤ãƒ³é–¢æ•°
 '
 Sub Main(arg() As String)
 
-    Dim a As String	' •Ï”‚
+    Dim a As String	' å¤‰æ•°ï½
     Dim b() As Integer
     
-    ' ‘ã“üˆ—
-    a = "Hello world."@'ƒnƒ[‚ğ‘ã“ü
+    ' ä»£å…¥å‡¦ç†
+    a = "Hello world."ã€€'ãƒãƒ­ãƒ¼ã‚’ä»£å…¥
     
-    ' o—Í
+    ' å‡ºåŠ›
     Msgbox "hello"
 
 End Sub

@@ -6,7 +6,7 @@ fun printInt i = print (Int.toString i)
 
 %term ID of string | INT of int | STRING of string
     | PRINT of string 
-    | EQUAL
+    | EQUAL | NOT_EQUAL
     | DIM
     | AS
     | SUB
@@ -15,6 +15,7 @@ fun printInt i = print (Int.toString i)
     | TY_INT
     | LPAREN | RPAREN
     | COMMA
+    | AMP
     | LINE_TERM
     | COMMENT of string
     | EOF
@@ -92,5 +93,7 @@ vbprimtype:
   
 exp: INT                         (Absyn.IntExp INT)
     | STRING                     (Absyn.StringExp (STRING, 0))
+    | exp AMP exp                (Absyn.OpExp {left=(exp1), oper=(Absyn.AmpOp), right=(exp2), pos=0})
+    | ID                         (Absyn.VarExp (Absyn.SimpleVar(Symbol.symbol ID, 0)))
 
 
